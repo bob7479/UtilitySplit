@@ -5,9 +5,11 @@
   <h1>CalHacks</h1>
   <div class=metanav>
   {% if not session.logged_in %}
-    <a href="{{ url_for('login') }}">log in</a>
+    <a href="{{ url_for('login') }}">Login</a>
   {% else %}
-    <a href="{{ url_for('logout') }}">log out</a>
+    <a href="{{ url_for('logout') }}">Log out</a>
+    <a href="{{ url_for('add_bill') }}">Add bill</a>
+
   {% endif %}
   </div>
   {% for message in get_flashed_messages() %}

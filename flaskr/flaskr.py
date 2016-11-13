@@ -60,7 +60,6 @@ def show_entries():
     db = get_db()
     cur = db.execute('select billname, category, frequency, cost from bills order by id desc')
     entries = cur.fetchall()
-    print(entries)
     return render_template('show_entries.html', entries=entries)
 
 @app.route('/add_bill', methods=['GET','POST'])

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-  {% if session.logged_in %}
+<!--   {% if session.logged_in %}
     <form action="{{ url_for('add_bill') }}" method=post class=add-bill>
       <dl>
         <dt>Billname:
@@ -20,7 +20,7 @@
         <dd><input type=submit value=Share>
       </dl>
     </form>
-  {% endif %}
+  {% endif %} -->
   <ul class=entries>
   {% for bill in entries %}
     <li><h2>{{ bill.billname }}</h2>
