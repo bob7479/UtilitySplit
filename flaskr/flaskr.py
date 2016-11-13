@@ -79,7 +79,15 @@ def add_bill():
 @app.route('/show_people', methods=['GET'])
 def show_people():
     db = get_db()
-    return render_template('show_people.html', db = db)
+    people = db.execute('select username from users') 
+    peoplelist = people.fetchall()
+    billslist = []
+    for p in peoplelist:
+        bills = db.execute('select billname, paid from users_bills where username = ?', [p])
+        billslist += bills.fetchall()
+    allbills = db.execute('select billname, category, frequency, cost from bills')
+    allbillstable = allbills.fetchall()
+    return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
     
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -101,4 +109,4 @@ def login():
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show_bills'))
+    return redirect(url_for('login'))
