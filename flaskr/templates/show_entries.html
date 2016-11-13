@@ -3,17 +3,32 @@
   {% if session.logged_in %}
     <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
-        <dt>Title:
-        <dd><input type=text size=30 name=title>
-        <dt>Text:
+        <dt>Billname:
+        <dd><input type=text size=30 name=billname>
+
+        <dt>Category:
+        <dd><input name=category size=30 type=text>
+
+        <dt>Frequency:
+        <dd><input name=frequency size=30 type=integer>
+
+        <dt>Cost:
+        <dd><input name=cost size=30 type=decimal>
+        
+        <dt>Comments:
         <dd><textarea name=text rows=5 cols=40></textarea>
         <dd><input type=submit value=Share>
       </dl>
     </form>
   {% endif %}
   <ul class=entries>
-  {% for entry in entries %}
-    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}
+  {% for bill in entries %}
+    <li><h2>{{ bill.billname }}</h2>
+    <pre>
+      Category: {{bill.category}}
+      Frequency: {{bill.frequency}} per month
+      Total Cost: ${{bill.cost}}
+    </pre>
   {% else %}
     <li><em>Unbelievable.  No entries here so far</em>
   {% endfor %}

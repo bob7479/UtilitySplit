@@ -28,9 +28,7 @@ def init_db():
     """Initializes the database."""
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.execute('insert into users (username, password) values (?, ?)',
-               (app.config['USERNAME'], app.config['PASSWORD']))    
+        db.cursor().executescript(f.read()) 
     db.commit()
 
 
@@ -60,9 +58,9 @@ def close_db(error):
 @app.route('/')
 def show_entries():
     db = get_db()
-    cur = db.execute('select title, text from entries order by id desc')
+    cur = db.execute('select billname, category, frequency, cost from bills order by id desc')
     entries = cur.fetchall()
-    # print(entries)
+    print(entries)
     return render_template('show_entries.html', entries=entries)
 
 
@@ -71,58 +69,26 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    db.execute('insert into entries (title, text) values (?, ?)',
-               [request.form['title'], request.form['text']])
+    db.execute('insert into bills (billname, category, frequency, cost) values (?, ?, ?, ?)',
+               [request.form['billname'], request.form['category'], \
+               request.form['frequency'], request.form['cost']])
     db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
 
-# @app.route('/signup', methods=['POST'])
-# def signup():
-# 	db = get_db()
-# 	db.execute('insert into users (username, password) values (?, ?',
-# 				request.form['username'], request.form['password'])
-# 	db.commit()
-# 	flash('New user successfully added')
-# 	return redirect(url_for('show_entries'))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-	db = get_db()
-	username = request.form['username']
-	password = request.form['password']
-	validLogin = db.execute('select * from users where username = ?', (username,))
-	validPassword = db.execute('select * from users where password = ?', (password,))
-	
-	cur = db.execute('select username, password from users order by id desc')
-	entries = cur.fetchall()
-	print entries
-	# print validLogin
-	# print validPassword
-	error = None
-	if request.method == 'POST':
-	    if validLogin == None:
-	        error = 'Invalid username'
-	    elif validPassword == None:
-	        error = 'Invalid password'
-	    else:
-	        session['logged_in'] = True
-	        flash('You were logged in')
-	        return redirect(url_for('show_entries'))
-	return render_template('login.html', error=error)
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     error = None
-#     if request.method == 'POST':
-#         if request.form['username'] != app.config['USERNAME']:
-#             error = 'Invalid username'
-#         elif request.form['password'] != app.config['PASSWORD']:
-#             error = 'Invalid password'
-#         else:
-#             session['logged_in'] = True
-#             flash('You were logged in')
-#             return redirect(url_for('show_entries'))
-#     return render_template('login.html', error=error)
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME']:
+            error = 'Invalid username'
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Invalid password'
+        else:
+            session['logged_in'] = True
+            flash('You were logged in')
+            return redirect(url_for('show_entries'))
+    return render_template('login.html', error=error)
 
 
 @app.route('/logout')
