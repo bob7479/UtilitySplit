@@ -1,6 +1,6 @@
 drop table if exists entries;
 drop table if exists users;
-drop table if exists bills;
+-- drop table if exists bills;
 drop table if exists users_bills;
 create table entries (
 	id integer primary key autoincrement,
@@ -28,3 +28,7 @@ create table users_bills (
 	billname text not null, 
 	paid boolean not null
 );
+
+-- select username, billname, paid from users 
+-- join users_bills on users_bills.username = users.username 
+-- join bills on bills.billname = users_bills.billname;
