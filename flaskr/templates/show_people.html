@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+<ul class=entries>
+	{% list = db.execute('select username from users')}
+	{% people = list.fetchall() %}
+  	{% for p in people %}
+    	<li><h2>{{ p.username }}</h2>
+    	{% billing = db.execute('select billname, paid from users_bills where username = ?', [p]) %}
+    	{% bills = list.fetchall() %}
+
+    	{for b in bills}
+    		{% info = db.execute('select billname, paid from users_bills where username = ?', [p]) %}
+    	{% bills = list.fetchall() %}
+	    	<pre>
+	    	  Category: {{b.category}}
+	    	  Frequency: {{bill.frequency}} per month
+	    	  Total Cost: ${{bill.cost}}
+	    	</pre>
+    	{% endfor %}
+  	{% endfor %}
+</ul>
+{% endblock %}

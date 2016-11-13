@@ -56,11 +56,11 @@ def close_db(error):
 
 
 @app.route('/')
-def show_entries():
+def show_bills():
     db = get_db()
     cur = db.execute('select billname, category, frequency, cost from bills order by id desc')
-    entries = cur.fetchall()
-    return render_template('show_entries.html', entries=entries)
+    bills = cur.fetchall()
+    return render_template('show_bills.html', entries=bills)
 
 @app.route('/add_bill', methods=['GET','POST'])
 def add_bill():
@@ -73,8 +73,13 @@ def add_bill():
                request.form['frequency'], request.form['cost']])
         db.commit()
         flash('New entry was successfully posted')
-        return redirect(url_for('show_entries'))
+        return redirect(url_for('show_bills'))
     return render_template('add_bill.html')
+
+@app.route('/show_people', methods=['GET'])
+def show_people():
+    db = get_db()
+    return render_template('show_people.html', db = db)
     
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -88,7 +93,7 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
-            return redirect(url_for('add_bill'))
+            return redirect(url_for('show_bills'))
     return render_template('login.html', error=error)
 
 
@@ -96,4 +101,4 @@ def login():
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('show_bills'))

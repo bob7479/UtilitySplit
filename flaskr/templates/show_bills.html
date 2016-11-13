@@ -1,4 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-<h1>hi</h1>
+  <ul class=entries>
+  {% for bill in entries %}
+    <li><h2>{{ bill.billname }}</h2>
+    <pre>
+      Category: {{bill.category}}
+      Frequency: {{bill.frequency}} per month
+      Total Cost: ${{bill.cost}}
+    </pre>
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
 {% endblock %}
