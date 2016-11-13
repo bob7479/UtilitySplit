@@ -2,7 +2,7 @@
 {% block body %}
   <h2>Add Bill</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('add_bill') }}" method=post>
+  <form action="{{ url_for('add_bill') }}" method=post class=add-bill>
     <dl>
       <dt>Bill Name:
       <dd><input type=text name=billname>
