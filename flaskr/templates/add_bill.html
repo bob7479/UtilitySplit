@@ -2,18 +2,27 @@
 {% block body %}
   <h2>Add Bill</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('______') }}" method=post>
+  <form action="{{ url_for('add_bill') }}" method=post>
     <dl>
       <dt>Bill Name:
       <dd><input type=text name=billname>
+
       <dt>Category:
       <dd>
-      	<select>
+      	<select name=category>
   			<option value="food">Food</option>
   			<option value="utilities">Utilities</option>
   			<option value="supplies">Supplies</option>
+  		<dd>
 
-      <dd><input type=submit value=Login>
+  		<dt>Frequency per Month:
+      	<dd><input type=number name=frequency>
+
+      	<dt>Cost:
+      	<dd><input type=number name=cost>
+
+      	<dd><input type=submit value=Submit>
+
     </dl>
   </form>
 {% endblock %}
