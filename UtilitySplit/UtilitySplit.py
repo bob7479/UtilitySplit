@@ -86,6 +86,7 @@ def show_people():
     db = get_db()
     people = db.execute('select username from users') 
     peoplelist = people.fetchall()
+<<<<<<< HEAD
     billslist = []
     for p in peoplelist:
         bills = db.execute('select billname, paid from users_bills where username = ?', [p])
@@ -93,6 +94,19 @@ def show_people():
     allbills = db.execute('select billname, category, frequency, cost from bills')
     allbillstable = allbills.fetchall()
     return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
+=======
+    
+    # print(peoplelist[0][0])
+    # return peoplelist[0][0]
+    # billslist = []
+    # for p in peoplelist:
+    #     bills = db.execute('select billname, paid from users_bills where username = ?', p)
+    #     billslist += bills.fetchall()
+    #     # print(billslist)
+    # allbills = db.execute('select billname, category, frequency, cost from bills')
+    # allbillstable = allbills.fetchall()
+    # return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
+>>>>>>> 7317c9171ddbf6efd1b30c3f66255dc9fbed0cc3
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
