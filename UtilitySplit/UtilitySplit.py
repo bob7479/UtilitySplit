@@ -59,9 +59,8 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
-    # return rv
 
-@app.route('/')
+@app.route('/show_bills')
 def show_bills():
     db = get_db()
     cur = db.execute('select billname, category, frequency, cost from bills order by id desc')
@@ -94,7 +93,6 @@ def show_people():
     allbills = db.execute('select billname, category, frequency, cost from bills')
     allbillstable = allbills.fetchall()
     return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
-    
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -112,10 +110,25 @@ def login():
             return redirect(url_for('show_bills'))
     return render_template('login.html', error=error)
 
-
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('login'))
 
+@app.route('/', methods=['GET', 'POST'])
+def add_user():
+    error = None
+    if request.method == 'POST':
+        db = get_db()
+        user = query_db('select * from users where username = ?',[request.form['username']])
+        if user == []:
+            db.execute('insert into users (username, password) values (?, ?)', [request.form['username'], \
+                request.form['password']])
+            db.commit()
+            session['logged_in'] = True
+            flash('New user was successfully added and logged in')
+            return redirect(url_for('show_bills'))
+        else:
+            error = 'Username already taken'
+    return render_template('add_user.html', error = error)
