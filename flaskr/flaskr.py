@@ -16,7 +16,6 @@ app.config.update(dict(
 ))
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
-
 def connect_db():
     """Connects to the specific database."""
     rv = sqlite3.connect(app.config['DATABASE'])
@@ -28,7 +27,8 @@ def init_db():
     """Initializes the database."""
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read()) 
+        db.cursor().executescript(f.read())
+    db.execute('insert into users (username, password) values (?, ?)', [app.config['USERNAME'], app.config['PASSWORD']])
     db.commit()
 
 
@@ -54,6 +54,12 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
+def query_db(query, args=(), one=False):
+    cur = get_db().execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    return (rv[0] if rv else None) if one else rv
+    # return rv
 
 @app.route('/')
 def show_bills():
@@ -86,9 +92,11 @@ def show_people():
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
+        user = query_db('select * from users where username = ?',[request.form['username']])
+        password = query_db('select * from users where password = ?', [request.form['password']])
+        if user == []:
             error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        elif password == []:
             error = 'Invalid password'
         else:
             session['logged_in'] = True
@@ -101,4 +109,4 @@ def login():
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show_bills'))
+    return redirect(url_for('login'))
