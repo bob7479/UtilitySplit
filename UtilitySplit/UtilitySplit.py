@@ -12,7 +12,6 @@ app.config.update(dict(
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default'
-
 ))
 app.config.from_envvar('UTILITYSPLIT_SETTINGS', silent=True)
 
@@ -28,7 +27,6 @@ def init_db():
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
         db.cursor().executescript(f.read())
-    db.execute('insert into users (username, password) values (?, ?)', [app.config['USERNAME'], app.config['PASSWORD']])
     db.commit()
 
 
@@ -86,27 +84,6 @@ def show_people():
     db = get_db()
     people = db.execute('select username from users') 
     peoplelist = people.fetchall()
-<<<<<<< HEAD
-    billslist = []
-    for p in peoplelist:
-        bills = db.execute('select billname, paid from users_bills where username = ?', [p])
-        billslist += bills.fetchall()
-    allbills = db.execute('select billname, category, frequency, cost from bills')
-    allbillstable = allbills.fetchall()
-    return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
-=======
-    
-    # print(peoplelist[0][0])
-    # return peoplelist[0][0]
-    # billslist = []
-    # for p in peoplelist:
-    #     bills = db.execute('select billname, paid from users_bills where username = ?', p)
-    #     billslist += bills.fetchall()
-    #     # print(billslist)
-    # allbills = db.execute('select billname, category, frequency, cost from bills')
-    # allbillstable = allbills.fetchall()
-    # return render_template('show_people.html', people = peoplelist, bills = billslist, allbills = allbillstable)
->>>>>>> 7317c9171ddbf6efd1b30c3f66255dc9fbed0cc3
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -121,6 +98,10 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
+            USERNAME = request.form['username']
+            PASSWORD = request.form['password']
+            app.config['USERNAME'] = USERNAME
+            app.config['PASSWORD'] = PASSWORD
             return redirect(url_for('show_bills'))
     return render_template('login.html', error=error)
 
@@ -129,6 +110,19 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('login'))
+
+@app.route('/change', methods=['GET', 'POST'])
+def change():
+    if request.method == 'POST':
+        PASSWORD = request.form['password']
+        app.config['PASSWORD'] = PASSWORD
+        db = get_db()
+        db.execute('update users set password = ? where username = ?', [app.config['PASSWORD'], app.config['USERNAME']])
+        db.commit()
+        flash('Password successfully changed')
+        return redirect(url_for('show_bills'))
+    return render_template('change.html')
+
 
 @app.route('/', methods=['GET', 'POST'])
 def add_user():
