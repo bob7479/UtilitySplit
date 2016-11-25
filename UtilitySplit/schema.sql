@@ -1,5 +1,9 @@
 drop table if exists entries;
 drop table if exists users;
+drop table if exists bills;
+drop table if exists users_bills;
+
+
 -- drop table if exists bills;
 drop table if exists users_bills;
 create table entries (
