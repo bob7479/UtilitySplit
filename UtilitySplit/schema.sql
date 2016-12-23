@@ -1,3 +1,4 @@
+
 drop table if exists entries;
 drop table if exists users;
 drop table if exists bills;
@@ -19,7 +20,8 @@ create table users (
 );
 
 create table bills (
-	id integer primary key autoincrement, 
+	id integer primary key autoincrement,
+	username text not null,
 	billname text not null, 
 	category text not null,
 	frequency integer not null, 

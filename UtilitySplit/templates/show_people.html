@@ -1,13 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-<ul class=entries>
-  {% for p in peoplelist %}
+<ul class=people, class=bills>
+  {% for p in people %}
     <li><h2>{{ p.username }}</h2>
-    <pre>
-<!--       Category: {{bill.category}}
-      Frequency: {{bill.frequency}} per month
-      Total Cost: ${{bill.cost}} -->
-    </pre>
+  	{% for b in bills %}
+    	{{ b.billname }}
+    	{{ b.paid }}
+    {% endfor %}
   {% endfor %}
 </ul>
 {% endblock %}

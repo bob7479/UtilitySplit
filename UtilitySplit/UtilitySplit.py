@@ -45,7 +45,12 @@ def get_db():
         g.sqlite_db = connect_db()
     return g.sqlite_db
 
-
+# def merge():
+#     db = get_db()
+#     cur = db.execute('select username, billname from users')
+#     db.execute('join users_bills on users_bills.username = users.username')
+#     db.execute('join bills on bills.billname = users_bills.billname')
+    
 @app.teardown_appcontext
 def close_db(error):
     """Closes the database again at the end of the request."""
@@ -61,7 +66,7 @@ def query_db(query, args=(), one=False):
 @app.route('/show_bills')
 def show_bills():
     db = get_db()
-    cur = db.execute('select billname, category, frequency, cost from bills order by id desc')
+    cur = db.execute('select username, billname, category, frequency, cost from bills order by username desc')
     bills = cur.fetchall()
     return render_template('show_bills.html', entries=bills)
 
@@ -71,8 +76,10 @@ def add_bill():
         abort(401)
     if request.method == 'POST':
         db = get_db()
-        db.execute('insert into bills (billname, category, frequency, cost) values (?, ?, ?, ?)',
-               [request.form['billname'], request.form['category'], \
+        db.execute('insert into users_bills (username, billname, paid) values (?, ?, ?)',
+               [app.config['USERNAME'], request.form['billname'], False])
+        db.execute('insert into bills (username, billname, category, frequency, cost) values (?, ?, ?, ?, ?)',
+               [app.config['USERNAME'], request.form['billname'], request.form['category'], \
                request.form['frequency'], request.form['cost']])
         db.commit()
         flash('New entry was successfully posted')
@@ -82,8 +89,12 @@ def add_bill():
 @app.route('/show_people', methods=['GET'])
 def show_people():
     db = get_db()
-    people = db.execute('select username from users') 
-    peoplelist = people.fetchall()
+    people = db.execute('select username from users order by username') 
+    people_list = people.fetchall()
+
+    people_bills = db.execute('select username from users_bills order by username').fetchall()
+
+    return render_template('show_people.html', people=people_list, bills = people_bills)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -98,10 +109,8 @@ def login():
         else:
             session['logged_in'] = True
             flash('You were logged in')
-            USERNAME = request.form['username']
-            PASSWORD = request.form['password']
-            app.config['USERNAME'] = USERNAME
-            app.config['PASSWORD'] = PASSWORD
+            app.config['USERNAME'] = request.form['username']
+            app.config['PASSWORD'] = request.form['password']
             return redirect(url_for('show_bills'))
     return render_template('login.html', error=error)
 
@@ -114,8 +123,7 @@ def logout():
 @app.route('/change', methods=['GET', 'POST'])
 def change():
     if request.method == 'POST':
-        PASSWORD = request.form['password']
-        app.config['PASSWORD'] = PASSWORD
+        app.config['PASSWORD'] = request.form['password']
         db = get_db()
         db.execute('update users set password = ? where username = ?', [app.config['PASSWORD'], app.config['USERNAME']])
         db.commit()
@@ -134,6 +142,8 @@ def add_user():
             db.execute('insert into users (username, password) values (?, ?)', [request.form['username'], \
                 request.form['password']])
             db.commit()
+            app.config['USERNAME'] = request.form['username']
+            app.config['PASSWORD'] = request.form['password']
             session['logged_in'] = True
             flash('New user was successfully added and logged in')
             return redirect(url_for('show_bills'))

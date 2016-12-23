@@ -4,12 +4,11 @@
   {% for bill in entries %}
     <li><h2>{{ bill.billname }}</h2>
     <pre>
-      Category: {{bill.category}}
-      Frequency: {{bill.frequency}} per month
-      Total Cost: ${{bill.cost}}
+      Username: {{ bill.username }}
+      Category: {{ bill.category }}
+      Frequency: {{ bill.frequency }} per month
+      Total Cost: ${{ bill.cost }}
     </pre>
-  {% else %}
-    <li><em>Add something here?</em>
   {% endfor %}
   </ul>
 {% endblock %}
